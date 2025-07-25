@@ -6,3 +6,4 @@ pandas
 scikit-image>=0.21
 scikit-learn
 plotly
+scipy
