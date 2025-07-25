@@ -140,21 +140,36 @@ with c2:
 tab2d, tab3d = st.tabs(["💠 Mappa 2-D", "🧊 Scatter 3-D"])
 
 with tab2d:
-    st.subheader("Mappa 2-D: pressione [MPa]")
-    if df.empty:
+    st.subheader("Mappa 2-D: pressione continua")
+    if np.isnan(press_map).all():
         st.info("Nessun pixel valido.")
     else:
-        df_show = df if len(df)<=sample_max else df.sample(sample_max, random_state=0)
-        fig2d = px.scatter(
-            df_show, x="x_px", y="y_px", color="Pressione",
-            color_continuous_scale="Turbo",
-            height=700, width=900,
-            hover_data={"x_px":True,"y_px":True,"Pressione":":.2f","Densità":":.2f"},
+        # opzionale: filtra/sfuma leggermente solo per visualizzare
+        # from scipy.ndimage import gaussian_filter
+        # z_show = gaussian_filter(press_map, sigma=1)
+        z_show = press_map
+
+        fig2d = px.imshow(
+            np.flipud(z_show),        # origine in basso
+            origin="lower",
+            color_continuous_scale="Jet",   # Jet, Turbo, Viridis…
+            aspect="auto",
+            labels=dict(color="Pressione [MPa]"),
+            height=700, width=900
         )
-        fig2d.update_traces(marker=dict(size=dot_size))
-        fig2d.update_yaxes(title="y [px] (origine in basso)")  # 🔸 niente invert
-        fig2d.update_xaxes(title="x [px]")
+
+        # isolinee sottili (facoltative)
+        fig2d.add_contour(
+            z=np.flipud(z_show),
+            colorscale="Greys",
+            showscale=False,
+            line_width=0.5,
+            contours=dict(showlabels=False, start=np.nanmin(z_show),
+                          end=np.nanmax(z_show), size=0.1)
+        )
+
         st.plotly_chart(fig2d, use_container_width=True)
+
 
 with tab3d:
     st.subheader("Scatter 3-D: z = pressione [MPa]")
