@@ -97,7 +97,6 @@ else:
                        c=df_show["Value"], cmap="Reds", s=4)
     ax_sc.set_xlabel("x [px]")
     ax_sc.set_ylabel("y [px] (origine in basso)")
-    ax_sc.invert_yaxis()
     fig_sc.colorbar(sc, ax=ax_sc, label="Valore quantizzato")
     st.pyplot(fig_sc)
 
